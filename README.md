@@ -1,7 +1,8 @@
 # Guitar-Sidekick
 ### Easily find notes in key, and find new scales. Configurable for any type of guitar. Created by Derek Schubert
 
-## Project is in Early Development
+_Note: Project is in Early Development_
+
 ![Guitar Overview GIF](https://firebasestorage.googleapis.com/v0/b/derekschubert-1e55f.appspot.com/o/github-resources%2Fguitar%2Foverview.gif?alt=media&token=a93ca91a-24d6-4ce7-a635-c0f6e66d7f6d "Guitar Overview")
 
 ## Technologies
