@@ -1,0 +1,51 @@
+.fret {
+  width: 50px;
+  border-right: 1px solid #555;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.fret > .note {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  font-size: 20px;
+  color: #333;
+}
+
+.fret > .in-scale {
+  font-size: 14px;
+  color: #555;
+  padding-right: 4px;
+}
+
+.fret > .muted {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  font-size: 14px;
+  color: #777;
+}
+
+.fret.fret-position {
+  border-right: none;
+  padding-left: 1px;
+}
+
+.fret.fret-position.first {
+  padding-right: 4px;
+}
+
+.fret.fret-button:hover {
+  cursor: pointer;
+}
+
+.fret.fret-button.fret-selected {
+  background-color: rgba(50, 120, 230, 0.4);
+}
