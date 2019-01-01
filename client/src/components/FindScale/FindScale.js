@@ -49,8 +49,6 @@ export default ({ hideScaleFinder }) => {
   let { controls } = useContext(ControlsContext);
   let [selectedFrets, setSelectedFrets] = useState([]);
   let [possibleScales, setPossibleScales] = useState(controls.constants.allScales);
-  
-  let tuning = [...controls.tuning].reverse();
 
   const onFretClick = ({ note }) => {
     if (selectedFrets.includes(note)) {
