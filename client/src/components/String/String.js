@@ -19,7 +19,7 @@ export const FretPositions = ({ capo, frets }) => {
   );
 };
 
-export default ({ controls, openNote, notesInScale, capo, forceShowAllNotes, isButton, onClick, selectedFrets }) => {
+export default ({ controls, openNote, notesInScale, capo, forceShowAllNotes, isButton, onClick, selectedFrets, string, type }) => {
   const { frets, constants } = controls;
   let showAllNotes = forceShowAllNotes ? true : controls.showAllNotes;
 
@@ -43,7 +43,10 @@ export default ({ controls, openNote, notesInScale, capo, forceShowAllNotes, isB
     if (i === 0) style.borderRight = '6px solid #000';
 
     fretsJSX.push(
-      <Fret key={i} 
+      <Fret key={i}
+        position={i}
+        type={type}
+        string={string}
         note={note} 
         showAllNotes={showAllNotes} 
         displayNote={noteInScale} 
