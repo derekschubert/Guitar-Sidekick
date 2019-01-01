@@ -49,3 +49,7 @@
 .fret.fret-button.fret-selected {
   background-color: rgba(50, 120, 230, 0.4);
 }
+
+.fret.fret-button.fret-selected-root {
+  background-color: rgba(230, 120, 50, 0.4);
+}

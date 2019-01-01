@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
-import { ControlsContext } from '../Controls';
-import String, { FretPositions } from '../String';
+import ControlsContext from 'contexts/Controls';
+import Fretboard from '../Fretboard';
 import { arrayFullyIncludes } from '../Helpers';
 
 const determinePossibleScales = ({ selectedFrets, allScales }) => {
@@ -49,8 +49,6 @@ export default ({ hideScaleFinder }) => {
   let { controls } = useContext(ControlsContext);
   let [selectedFrets, setSelectedFrets] = useState([]);
   let [possibleScales, setPossibleScales] = useState(controls.constants.allScales);
-  
-  let tuning = [...controls.tuning].reverse();
 
   const onFretClick = ({ note }) => {
     if (selectedFrets.includes(note)) {
@@ -78,13 +76,12 @@ export default ({ hideScaleFinder }) => {
 
   return (
     <div className='find-scale'>
-      <div className='fretboard'>
-        {controls.showTopFretPositions && <FretPositions capo={controls.capo} frets={controls.frets} />}
-
-        {tuning.map((t, i) => <String key={i} selectedFrets={selectedFrets} openNote={t} isButton={true} onClick={onFretClick} notesInScale={null} forceShowAllNotes={true} controls={controls} capo={controls.capo} />)}
-
-        {controls.showBottomFretPositions && <FretPositions capo={controls.capo} frets={controls.frets} />}
-      </div>
+      <Fretboard selectedFrets={selectedFrets} 
+        notesInScale={null}
+        onClick={onFretClick} 
+        forceShowAllNotes={true}
+        type={'FindScale'}
+      />
       <ScaleResults hideScaleFinder={hideScaleFinder} possibleScales={possibleScales} selectedFrets={selectedFrets} />
     </div>
   );

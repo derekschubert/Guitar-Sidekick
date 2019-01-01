@@ -1,71 +1,44 @@
 import React, { useContext, useState } from 'react';
 
-import { ControlsContext } from '../Controls/Controls';
-import String, { FretPositions } from '../String/String';
-import { arrayFullyIncludes } from '../Helpers';
+import ControlsContext from 'contexts/Controls';
+import Fretboard from '../Fretboard';
+import { findNotesInSelectedScale } from '../Helpers';
 
-const determinePossibleScales = ({ selectedFrets, allScales }) => {
-  let possibleScales = {};
-
-  Object.entries(allScales).forEach(([key, scale]) => {
-    if (arrayFullyIncludes({ source: scale.notes, includes: selectedFrets })) {
-      possibleScales[key] = {...scale};
-    }
-  });
-
-  return possibleScales;
+// Coming Soon
+const determinePossibleChords = (selectedNotes) => {
+  const notes = selectedNotes.map(n => n.split('-')[2]);
+  console.log(notes);
 };
 
-const ScaleResults = ({ possibleScales, selectedFrets, hideScaleFinder }) => {
-  let { dispatch } = useContext(ControlsContext);
-
-  const onClick = ({ root, scale }) => {
-    hideScaleFinder();
-    dispatch({ type: 'SET_KEY_AND_SCALE', key: root, scale });
-  };
-
-  return (
-    <table className='scale-results'>
-      <tbody>
-        <tr>
-          <td>Selected Frets:</td>
-          {selectedFrets.map((sf, i) => <td key={i}>{sf}</td>)}
-        </tr>
-          {Object.entries(possibleScales).map(([key, possibleScale]) => (
-            <tr key={key}>
-              <td>{key}</td>
-              {possibleScale.notes.map((s, i) => <td key={i}>{s}</td>)}
-              <td>
-                <button onClick={() => onClick(possibleScale)}>Use Scale</button>
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
-  );
-};
-
-export default ({ hideScaleFinder }) => {
+export default () => {
   let { controls } = useContext(ControlsContext);
   let [selectedFrets, setSelectedFrets] = useState([]);
-  let [possibleScales, setPossibleScales] = useState(controls.constants.allScales);
   
-  let tuning = [...controls.tuning].reverse();
+  let notesInScale = findNotesInSelectedScale({ controls });
+  
+  const onFretClick = ({ string, position, note }) => {
+    if (!notesInScale.includes(note)) return;
+    
+    let newSelectedFrets = [...selectedFrets];
+    let fret = `${string}-${position}-${note}`;
 
-  const onFretClick = () => {
-    console.log('Clicked');
+    if (selectedFrets[0] === fret) {
+      newSelectedFrets = [];
+    } else if (selectedFrets.includes(fret)) {
+      newSelectedFrets.splice(newSelectedFrets.indexOf(fret), 1);
+    } else {
+      newSelectedFrets.push(fret);
+    }
+
+    if (newSelectedFrets.length >= 2) determinePossibleChords(newSelectedFrets);
+    setSelectedFrets(newSelectedFrets);
   };
 
   return (
-    <div className='find-scale'>
-      <div className='fretboard'>
-        {controls.showTopFretPositions && <FretPositions capo={controls.capo} frets={controls.frets} />}
-
-        {tuning.map((t, i) => <String key={i} selectedFrets={selectedFrets} openNote={t} isButton={true} onClick={onFretClick} notesInScale={null} forceShowAllNotes={true} controls={controls} capo={controls.capo} />)}
-
-        {controls.showBottomFretPositions && <FretPositions capo={controls.capo} frets={controls.frets} />}
-      </div>
-      <ScaleResults hideScaleFinder={hideScaleFinder} possibleScales={possibleScales} selectedFrets={selectedFrets} />
-    </div>
+    <Fretboard selectedFrets={selectedFrets}
+      notesInScale={notesInScale}
+      onClick={onFretClick}
+      type={'FindChord'}
+    />
   );
 };
