@@ -1,99 +1,99 @@
-import React, { createContext, useReducer } from 'react';
-import Controls from './ControlsContent';
-import { generateScales } from '../Helpers';
+import React, { useState, useContext } from 'react';
+import ControlsContext from 'contexts/Controls';
 
-export const ControlsContext = createContext({});
+import Select from '../Inputs/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import Panel from '../Inputs/Panel';
+import InputField from '../Inputs/InputField';
 
-let constants = {
-  notes: ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'],
-  scales: {
-    'major': {
-      name: 'major',
-      abr: 'maj',
-      pattern: [2, 2, 1, 2, 2, 2, 1],
-      notes: [0, 2, 4, 5, 7, 9, 11],
-    },
-    'minor': {
-      name: 'minor',
-      abr: 'min',
-      pattern: [2, 1, 2, 2, 1, 2, 2],
-      notes: [0, 2, 3, 5, 7, 8, 10],
-    },
+const helpers = {
+  capitalize: (string) => {
+    let s = '';
+    for (let i = 0; i < string.length; i++) {
+      if (i === 0) s += string[i].toUpperCase();
+      else s += string[i];
+    }
+    return s;
   },
 };
 
-constants['allScales'] = generateScales({ constants });
+const Key = ({ controls, dispatch }) => (
+  <Select label='Key'
+    value={controls.key}
+    onChange={(e) => dispatch({ type: 'SET_KEY', key: e.target.value })}
+  >
+    {controls.constants.notes.map(n => (
+      <MenuItem key={n} value={n}>{n.toUpperCase()}</MenuItem>
+    ))}
+  </Select>
+);
 
-const initialControls = {
-  constants,
-  key: 'b',
-  scale: 'minor',
-  frets: 15,
-  strings: 6,
-  capo: 0,
-  tuning: ['e', 'a', 'd', 'g', 'b', 'e'],
-  // tuning: ['d', 'a', 'e', 'a', 'c#', 'e'],
-  selectedPanel: null,
-  showAllNotes: false,
-  showTopFretPositions: false,
-  showBottomFretPositions: true,
-};
+const Scale = ({ controls, dispatch }) => (
+  <Select value={controls.scale}
+    label='Scale'
+    onChange={(e) => dispatch({ type: 'SET_SCALE', scale: e.target.value })}
+  >
+    {Object.entries(controls.constants.scales).map(([name, _]) => (
+      <MenuItem key={name} value={name}>{helpers.capitalize(name)}</MenuItem>
+    ))}
+  </Select>
+);
 
-const controlsReducer = (controls, action) => {
-  const actions = {
-    'SET_KEY': () => ({ ...controls, key: action.key }),
-    'SET_SCALE': () => ({ ...controls, scale: action.scale }),
-    'SET_KEY_AND_SCALE': () => ({ ...controls, key: action.key, scale: action.scale }),
-    'SET_FRETS': () => {
-      const frets = Math.floor(action.frets);
-      if (0 <= frets && frets < 30) return { ...controls, frets };
-      else return { ...controls };
-    },
-    'SET_STRINGS': () => {
-      const strings = Math.floor(action.strings);
+const Tuning = ({ controls, dispatch }) => (
+  controls.tuning.map((t, i) => (
+    <Select key={i} value={t}
+      label={`${i + 1} String`}
+      onChange={(e) => dispatch({ type: 'SET_TUNING', tuning: e.target.value, string: i })}
+    >
+      {controls.constants.notes.map(n => (
+        <MenuItem key={n} value={n}>{n.toUpperCase()}</MenuItem>
+      ))}
+    </Select>
+  ))
+);
 
-      if (0 < strings && strings < 13) {
-        const dif = Math.abs(strings - controls.strings);
-        let tuning = [...controls.tuning];
+const Capo = ({ controls, dispatch }) => (
+  <InputField type='number'
+    label='Capo'
+    value={controls.capo}
+    onChange={(e) => dispatch({ type: 'SET_CAPO', capo: e.target.value })}
+  />
+);
 
-        for (let i = 0; i < dif; i++) {
-          if (strings > controls.strings) tuning.push('c');
-          else tuning.pop();
-        }
+const Strings = ({ controls, dispatch }) => (
+  <InputField type='number'
+    label='Strings'
+    value={controls.strings}
+    onChange={(e) => dispatch({ type: 'SET_STRINGS', strings: e.target.value })}
+  />
+);
 
-        return { ...controls, strings, tuning };
-      }
-      else return { ...controls };
-    },
-    'SET_CAPO': () => {
-      const capo = Math.floor(action.capo);
-      if (0 <= capo && capo <= controls.frets) return { ...controls, capo };
-      else return { ...controls };
-    },
-    'SET_SELECTED_PANEL': () => ({ ...controls, selectedPanel: action.selectedPanel }),
-    'SET_TUNING': () => {
-      const tuning = [ ...controls.tuning ];
-      tuning[action.string] = action.tuning;
-
-      return { ...controls, tuning };
-    },
-    'default': () => controls,
-    'error': () => console.err('Error in Controls Reducer'),
-  };
-
-  return (actions[action.type] || actions['error'])();
-};
-
-export const ControlsProvider = ({ children }) => {
-  const [controls, dispatch] = useReducer(controlsReducer, initialControls);
-
-  return (
-    <ControlsContext.Provider value={{ controls, dispatch }}>
-      {children}
-    </ControlsContext.Provider>
-  );
-};
+const Frets = ({ controls, dispatch }) => (
+  <InputField type='number'
+    label='Frets'
+    value={controls.frets}
+    onChange={(e) => dispatch({ type: 'SET_FRETS', frets: e.target.value })}
+  />
+);
 
 export default () => {
-  return <Controls />;
+  const ctx = useContext(ControlsContext);
+  const selectedState = useState(null);
+
+  return (
+    <div>
+      <Panel title='Scale' selectedState={selectedState}>
+        <Key {...ctx} />
+        <Scale {...ctx} />
+      </Panel>
+      <Panel title='Tuning' selectedState={selectedState}>
+        <Tuning {...ctx} />
+        <Capo {...ctx} />
+      </Panel>
+      <Panel title='String and Fret Count' selectedState={selectedState}>
+        <Strings {...ctx} />
+        <Frets {...ctx} />
+      </Panel>
+    </div>
+  );
 };

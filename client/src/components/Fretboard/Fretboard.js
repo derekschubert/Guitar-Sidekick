@@ -1,9 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import './Fretboard.css';
 
-import { ControlsContext } from '../Controls';
+import ControlsContext from 'contexts/Controls';
 import String, { FretPositions } from '../String';
-import { findNotesInSelectedScale } from '../Helpers';
 
 export default ({ selectedFrets, notesInScale, onClick, forceShowAllNotes, type, }) => {
   const { controls } = useContext(ControlsContext);

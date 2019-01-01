@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 
-import { ControlsContext } from '../Controls';
+import ControlsContext from 'contexts/Controls';
 import Fretboard from '../Fretboard';
 import { arrayFullyIncludes } from '../Helpers';
 
